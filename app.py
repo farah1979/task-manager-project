@@ -23,6 +23,14 @@ def get_tasks():
     return render_template("tasks.html", tasks=tasks)
 
 
+@app.route("/search", methods=["GET", "POST"])
+def search():
+    query = request.form.get("query")
+    tasks =list(mongo.db.tasks.find({"$text": {"$search": query} })) 
+    return render_template("tasks.html", tasks=tasks)
+
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -112,6 +120,7 @@ def add_task():
         return redirect(url_for ("get_tasks"))
     categories =mongo.db.categories.find().sort("category_name", 1)
     return render_template("add_task.html", categories=categories)
+
 
 @app.route("/edit_task/<task_id>", methods=["GET","POST"])
 def edit_task(task_id):
